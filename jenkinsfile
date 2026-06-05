@@ -20,23 +20,23 @@ pipeline{
         }
         stage('Docker build'){
             steps{
-                bat 'docker build -t ${IMAGE_NAME} .'
+                bat "docker build -t ${IMAGE_NAME} ."
             }
         }
         stage('Docker tag'){
             steps{
-                bat 'docker tag ${IMAGE_NAME} ${IMAGE_NAME}:latest'
+                bat "docker tag ${IMAGE_NAME} ${IMAGE_NAME}:latest"
             }
         }
         stage('Deploy container'){
             steps{
-                bat '''
+                bat """
                     docker rm -f ${CONTAINER_NAME} || true
                     docker run -d
                     --name ${CONTAINER_NAME}
                     -p 8085:80
                     ${IMAGE_NAME}:latest
-                '''
+                """
             }
         }
 
