@@ -1,0 +1,56 @@
+pipeline{
+    agent any
+
+    environment {
+        IMAGE_NAME = "jenkins-demo"
+        CONTAINER_NAME = "jenkins-container"
+    }
+
+    stages{
+        stage('Checkout') {
+            steps{
+                git branch: "main",
+                url: "https://github.com/GaneshRagolu001/docker-jenkins-demo"
+            }
+        }
+        stage('Build'){
+            steps{
+                echo "Application build successfully"
+            }
+        }
+        stage('Docker build'){
+            steps{
+                bat 'docker build -t $IMAGE_NAME .'
+            }
+        }
+        stage('Docker tag'){
+            steps{
+                bat 'docker tag $IMAGE_NAME $IMAGE_NAME:latest'
+            }
+        }
+        stage('Deploy container'){
+            steps{
+                bat '''
+                    docker rm -f $CONTAINER_NAME || true
+                    docker run -d
+                    --name $CONTAINER_NAME
+                    -p 8085:80
+                    $IMAGE_NAME:latest
+                '''
+            }
+        }
+
+    }
+    post {
+
+        success {
+
+            echo 'Deployment Successful'
+        }
+
+        failure {
+
+            echo 'Deployment Failed'
+        }
+    }
+}
